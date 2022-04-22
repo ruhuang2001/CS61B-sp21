@@ -1,11 +1,12 @@
 package game2048;
 
+import java.awt.desktop.SystemSleepEvent;
 import java.util.Formatter;
 import java.util.Observable;
 
 
 /** The state of a game of 2048.
- *  @author TODO: YOUR NAME HERE
+ *  @author ruhuang2001
  */
 public class Model extends Observable {
     /** Current contents of the board. */
@@ -137,7 +138,15 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+
+		for (int i = 0; i < b.size(); i++) {
+			for (int j = 0; j < b.size(); j++) {
+				if (b.tile(i, j) == null) {
+					return true;
+				}
+			}
+		}
+
         return false;
     }
 
@@ -147,7 +156,16 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+
+		for (int i = 0; i < b.size(); i++) {
+			for (int j = 0; j < b.size(); j++) {
+				// Before check the maxTile, check if emptySpaceExists.
+				if (b.tile(i, j) != null && b.tile(i, j).value() == MAX_PIECE) {
+					return true;
+				}
+			}
+		}
+
         return false;
     }
 
@@ -158,10 +176,42 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
-        return false;
+        return emptySpaceExists(b) || (checkAdjacentTimes(b) >= 2);
     }
 
+	private static int checkAdjacentTimes(Board b) {
+		// find the same value of adjacent tiles times
+		int times = 0;
+
+		int edge = b.size() - 1;
+
+		/**
+		 * Check the inner tiles adjacent times,
+		 * except the row or col equal to edge.
+		 */
+		for (int i = 0; i < edge; i++) {
+			for (int j = 0; j < edge; j++) {
+				if (b.tile(i, j).value() == b.tile(i, j+1).value()) {
+					times += 1;
+				}
+				if (b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+					times += 1;
+				}
+			}
+		}
+
+		/**
+		 * Check the tiles adjacent times whose row or col equal to edge.
+		 */
+		for (int i = 0; i < edge; i++) {
+			if (b.tile(i, edge).value() == b.tile(i + 1, edge).value())
+				times += 1;
+			if (b.tile(edge, i).value() == b.tile(edge, i + 1).value())
+				times += 1;
+		}
+		return times;
+
+	}
 
     @Override
      /** Returns the model as a string, used for debugging. */
